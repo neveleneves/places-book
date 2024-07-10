@@ -1,21 +1,12 @@
 import axios from "axios";
-import type { CommitOptions, Payload } from "vuex";
+import type { Action } from "../types";
+import config from "../../config.json";
 
-// Вынести в отедельный файл
-export interface Commit {
-  (type: string, payload?: any, options?: CommitOptions): void;
-  <P extends Payload>(payloadWithType: P, options?: CommitOptions): void;
-}
-
-export const fetchPlaces = async ({ commit }: {commit: Commit}) => {
+export const fetchPlaces = async ({ commit }: Action) => {
   try {
-    //Чуть позже будет api от Яндекса (нужно оформить бесплатную лицензию)
-    const data = await axios.get(
-      "https://jsonplaceholder.typicode.com/places"
-    );
-    
-    commit("SET_PLACES", data.data);
+    const data = await axios.get(`https://search-maps.yandex.ru/v1/`, {params: {...config.search}});
+    commit("SET_PLACES", data?.data?.features);
   } catch (error) {
-    console.log(error);
+    console.error("Ошибка поиска по организациям:", error);
   }
 };
